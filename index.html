@@ -1,0 +1,211 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-primary text-uppercase text-center">crud</h1>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                Open modal
+              </button>
+          </div>
+
+
+          <h2 class="text-primary">ALL RECORDS</h2>
+
+          <div id="record_content">
+
+          </div>
+
+
+          <!-- modal-->
+
+          <div class="modal" id="myModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+          
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">AJAX CRUD OPERATION</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+          
+                <!-- Modal body -->
+                <div class="modal-body">
+                   <div class="form-group">
+                       <label for="firstname">First Name</label>
+                       <input type="text" name="" id="firstname" class="form-control">
+
+                       <label for="lastname">Last Name</label>
+                       <input type="text" name="" id="lastname" class="form-control">
+
+                       <label for="email">EMAIL</label>
+                       <input type="text" name="" id="email" class="form-control">
+
+                       <label for="mobile">MOBILE</label>
+                       <input type="text" name="" id="mobile" class="form-control">
+
+
+                   </div>
+                </div>
+          
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addrecord()">Save</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+          
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- UPDATE MODAL-->
+
+          <div class="modal" id="update_myModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+          
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">Modal Heading</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+          
+                <!-- Modal body -->
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label for="update_firstname">Update First Name</label>
+                    <input type="text" name="" id="update_firstname" class="form-control">
+
+                    <label for="update_lastname">Update Last Name</label>
+                    <input type="text" name="" id="update_lastname" class="form-control">
+
+                    <label for="update_email"> Update EMAIL</label>
+                    <input type="text" name="" id="update_email" class="form-control">
+
+                    <label for="update_mobile">Update MOBILE</label>
+                    <input type="text" name="" id="update_mobile" class="form-control">
+
+
+                </div>
+                </div>
+          
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="updateuserdetail()">Save</button>
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+                  <!-- HIDDEN INPUT FIELD-->
+                  <input type="hidden" id="hidden_user_id">
+                </div>
+          
+              </div>
+            </div>
+          </div>
+    </div>
+     
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+      readrecord()
+    })
+      //readrecord
+      function readrecord(){
+          var readrecord = "readrecord";
+          $.ajax({
+            url:"index.php",
+             type:'post',
+             data:{readrecord:readrecord},
+             success:function(data,status){
+                 $("#record_content").html(data);
+
+             } 
+          })
+      }
+
+      //addrecord
+       function addrecord(){
+         var firstname = $("#firstname").val()
+         var lastname =  $("#lastname").val()
+         var email =     $("#email").val()
+         var mobile =    $("#mobile").val()
+
+         //console.log(firstname)
+         //console.log(lastname)
+         //console.log(email)
+         //console.log(mobile)
+         $.ajax({
+             url:"index.php",
+             type:'post',
+             data:{firstname:firstname,lastname:lastname,email:email,mobile:mobile},
+             success:function(data,status){
+                readrecord();
+             }
+         })
+       }
+
+       //delete
+
+       function deleteuserdetail(delete_id){
+           var confrm = confirm("are you sure");
+
+           if(confrm == true){
+               $.ajax({
+                 url:"index.php",
+                 type:'post',
+                 data:{delete_id:delete_id},
+                 success:function(data,status){
+                     readrecord();
+                 }  
+               })
+           }
+
+       }
+
+       //getuserdetail
+
+       function getuserdetail(id){
+           $("#hidden_user_id").val(id);
+           $.post("index.php",{id:id},function(data,status){
+              var user = JSON.parse(data);
+              $("#update_firstname").val(user.firstname);
+              $("#update_lastname").val(user.lastname);
+              $("#update_email").val(user.email);
+              $("#update_mobile").val(user.mobile);
+              
+           });
+
+           $("#update_myModal").modal("show");
+       }
+
+       //update data
+       function updateuserdetail(){
+         var fname =  $("#update_firstname").val();
+         var lname =  $("#update_lastname").val();
+         var email =  $("#update_email").val();
+         var mobile = $("#update_mobile").val();
+         var hidden_user_id =$("#hidden_user_id").val();
+         $.post("index.php",{
+          hidden_user_id:hidden_user_id,fname:fname,lname:lname,email:email,mobile:mobile,
+         },
+         function(){
+           $("#update_myModal").modal("hide");
+           readrecord()
+         }) 
+       }
+       
+
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
